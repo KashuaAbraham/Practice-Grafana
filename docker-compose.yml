@@ -1,0 +1,17 @@
+version: '3.8'  # Specifies the Docker Compose file format version
+
+services:
+  grafana:
+    image: grafana/grafana:latest  # Pulls the latest Grafana image
+    container_name: grafana        # Names the container "grafana"
+    ports:
+      - "3000:3000"               # Maps port 3000 on host to 3000 in container
+    volumes:
+      - grafana-storage:/var/lib/grafana  # Persists Grafana data
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin       # Sets admin username (default: admin)
+      - GF_SECURITY_ADMIN_PASSWORD=secret  # Sets admin password (customize this!)
+    restart: unless-stopped       # Restarts container unless explicitly stopped
+
+volumes:
+  grafana-storage:               # Defines a named volume for data persistence
