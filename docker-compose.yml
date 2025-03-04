@@ -1,17 +1,40 @@
-version: '3.8'  # Specifies the Docker Compose file format version
+version: '3.8'
 
 services:
-  grafana:
-    image: grafana/grafana:latest  # Pulls the latest Grafana image
-    container_name: grafana        # Names the container "grafana"
-    ports:
-      - "3000:3000"               # Maps port 3000 on host to 3000 in container
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
     volumes:
-      - grafana-storage:/var/lib/grafana  # Persists Grafana data
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin       # Sets admin username (default: admin)
-      - GF_SECURITY_ADMIN_PASSWORD=secret  # Sets admin password (customize this!)
-    restart: unless-stopped       # Restarts container unless explicitly stopped
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - monitoring
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+networks:
+  monitoring:
+    driver: bridge
 
 volumes:
-  grafana-storage:               # Defines a named volume for data persistence
+  grafana_data:
